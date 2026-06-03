@@ -48,7 +48,7 @@ double norm_cdf(double y){
     if (y >= 0){
         return 1 - norm_pdf(y) * sum_k;
     }
-    else if (y < 0){
+    else {
         return 1.0 - norm_cdf(-y);
     };
 }

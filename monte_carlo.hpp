@@ -36,11 +36,11 @@ double monte_carlo_european_call_option_price(int no_of_sim,double S, double K, 
     double pay_off_sum = 0;
 
     //Create random device
-    random_device rd{};
-    mt19937 gen{rd()};
+    static random_device rd{};
+    static mt19937 gen{rd()};
 
     //Declare Normal distribution Z \sim N(0,1)
-    normal_distribution d{0.0,1.0};
+    static normal_distribution d{0.0,1.0};
 
     //Calculate the simulated stock price at time T then calculate the expectation:
     for (int i = 0; i < no_of_sim; i += 1){
