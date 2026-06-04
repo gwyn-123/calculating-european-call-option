@@ -9,6 +9,7 @@
 
 #include "black_scholes.hpp"
 #include "monte_carlo.hpp"
+#include "binomial_tree.hpp"
 
 using namespace std;
 
@@ -109,9 +110,27 @@ int main(){
     int monte_rows_used = min(static_cast<int>(scodfm.size()), max_row_for_test);
     double monte_carlo_absolute_error = total_absolute_error_monte / static_cast<double>(monte_rows_used);
 
+
+    //Using binomial tree
+
+    double binomial_tree_count = 0.0;
+    double total_absolute_error_binomial = 0.0;
+    auto start_binomial_tree_time = chrono::high_resolution_clock::now();
+    for (int i = 0; i < scodfm.size() && i < max_row_for_test; i += 1){
+        double binomial_tree_price = binomial_option_price(scodfm[i].S,scodfm[i].K,scodfm[i].T, scodfm[i].r, scodfm[i].sd, 100);
+        double difference = abs(binomial_tree_price - scodfm[i].call_option_price);
+        total_absolute_error_binomial += difference;
+    };
+    auto end_binomial_tree_time = chrono::high_resolution_clock::now();
+
+    int binomial_rows_used = min(static_cast<int>(scodfm.size()), max_row_for_test);
+    double binomial_tree_absolute_error = total_absolute_error_binomial / static_cast<double>(binomial_rows_used);
+    
     //Calculate the time:
     chrono::duration<double> black_scholes_time = end_black_scholes_time - start_black_scholes_time;
     chrono::duration<double> monte_carlo_time = end_monte_carlo_time - start_monte_carlo_time;
+    chrono::duration<double> binomial_tree_time = end_binomial_tree_time - start_binomial_tree_time;
+
     cout << "The number of lines of data we use for comparison is: " << scodfm.size() << endl;
     
     cout << "\nThe Black-Scholes function mean absolute error is: $" << black_scholes_absolute_error << endl;
@@ -121,5 +140,8 @@ int main(){
     cout << "Number of simulations per Monte-Carlo line: " << 1000 << endl;
     cout << "The time to run the Monte-Carlo method is: " << monte_carlo_time.count() << " seconds" << endl;
 
+    cout << "\nThe Binomial tree method mean absolute error is: $" << binomial_tree_absolute_error << endl;
+    cout << "Number of time steps in the mode: " << 100 << endl;
+    cout <<"The time to run the binomial tree method is: " << binomial_tree_time.count() << "seconds" << endl;
     return 0;
 }
